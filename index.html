@@ -3,116 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Discord Clone</title>
+    <title>Discord Ultra Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #1e1f22; color: white; font-family: sans-serif; }
-        .discord-scrollbar::-webkit-scrollbar { width: 8px; }
-        .discord-scrollbar::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 10px; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 50; }
+        @import url('https://fonts.googleapis.com/css2?family=GG+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'GG Sans', sans-serif; background-color: #1e1f22; color: white; margin: 0; overflow: hidden; }
+        .server-icon { transition: all 0.2s ease; border-radius: 50%; }
+        .server-icon:hover { border-radius: 16px; background-color: #5865f2; color: white; }
+        .active-pill { width: 4px; height: 40px; background: white; position: absolute; left: 0; border-radius: 0 4px 4px 0; }
+        .glass { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); }
+        .discord-scroll::-webkit-scrollbar { width: 8px; }
+        .discord-scroll::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 10px; }
+        input::placeholder { color: #80848e; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex h-screen">
 
-    <nav class="w-18 bg-[#1e1f22] flex flex-col items-center py-3 gap-3 border-r border-black/20">
-        <div class="w-12 h-12 bg-[#5865f2] rounded-3xl hover:rounded-2xl transition-all flex items-center justify-center cursor-pointer group">
-            <i class="fab fa-discord text-2xl"></i>
-        </div>
-        <div class="w-8 h-[2px] bg-[#35363c] rounded-full"></div>
-        <div id="serverList" class="flex flex-col gap-2">
-            <div class="w-12 h-12 bg-[#313338] rounded-3xl hover:rounded-2xl transition-all cursor-pointer overflow-hidden">
-                <img src="https://api.dicebear.com/7.x/identicon/svg?seed=1" alt="S1">
+    <nav class="w-[72px] bg-[#1e1f22] flex flex-col items-center py-3 shrink-0 gap-2 overflow-y-auto no-scrollbar">
+        <div class="relative flex items-center group">
+            <div class="active-pill scale-100"></div>
+            <div class="w-12 h-12 bg-[#5865f2] flex items-center justify-center cursor-pointer server-icon">
+                <i class="fab fa-discord text-2xl"></i>
             </div>
         </div>
-        <button onclick="alert('Créer un serveur')" class="w-12 h-12 bg-[#313338] hover:bg-[#23a559] text-[#23a559] hover:text-white rounded-3xl hover:rounded-2xl transition-all flex items-center justify-center">
+        <div class="w-8 h-[2px] bg-[#35363c] rounded-full mx-auto my-1"></div>
+        <div class="w-12 h-12 bg-[#313338] flex items-center justify-center cursor-pointer server-icon group">
+            <img src="https://api.dicebear.com/7.x/shapes/svg?seed=1" class="rounded-inherit w-full h-full object-cover">
+        </div>
+        <button class="w-12 h-12 bg-[#313338] text-[#23a559] flex items-center justify-center cursor-pointer server-icon hover:bg-[#23a559] hover:text-white">
             <i class="fas fa-plus"></i>
         </button>
     </nav>
 
-    <aside class="w-60 bg-[#2b2d31] flex flex-col">
-        <div class="h-12 border-b border-black/20 flex items-center px-4 font-bold shadow-sm">Mon Serveur</div>
-        <div class="flex-1 p-2 space-y-1 discord-scrollbar overflow-y-auto">
-            <div class="flex items-center gap-2 text-gray-400 hover:bg-[#35363c] hover:text-white p-2 rounded cursor-pointer">
-                <i class="fas fa-hashtag"></i> <span>général</span>
+    <aside class="w-60 bg-[#2b2d31] flex flex-col shrink-0">
+        <div class="h-12 border-b border-[#1e1f22] flex items-center px-4 font-bold shadow-sm cursor-pointer hover:bg-[#35363c] transition">
+            Mon Serveur Pro <i class="fas fa-chevron-down ml-auto text-xs"></i>
+        </div>
+        
+        <div class="flex-1 py-3 discord-scroll overflow-y-auto px-2">
+            <div class="text-[#80848e] text-[12px] font-bold uppercase px-2 mb-1 flex items-center">
+                Salons Textuels <i class="fas fa-plus ml-auto cursor-pointer hover:text-white"></i>
+            </div>
+            <div class="flex items-center gap-2 text-[#80848e] hover:bg-[#35363c] hover:text-[#dbdee1] p-2 rounded cursor-pointer group mb-1 bg-[#3f4147] text-white">
+                <i class="fas fa-hashtag text-lg"></i> <span class="font-medium">général</span>
+            </div>
+            <div onclick="showFriends()" class="flex items-center gap-2 text-[#80848e] hover:bg-[#35363c] hover:text-[#dbdee1] p-2 rounded cursor-pointer group">
+                <i class="fas fa-user-friends"></i> <span class="font-medium">Amis</span>
             </div>
         </div>
-        <div class="bg-[#232428] p-2 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <img id="userPfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-8 h-8 rounded-full bg-gray-600">
-                <div class="text-xs">
-                    <div id="userNameDisplay" class="font-bold">Utilisateur</div>
-                    <div class="text-gray-400">#0001</div>
-                </div>
+
+        <div class="bg-[#232428] p-2 flex items-center gap-2 group">
+            <div class="relative cursor-pointer" onclick="openSettings()">
+                <img id="mainPfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-8 h-8 rounded-full bg-[#5865f2]">
+                <div class="absolute bottom-0 right-0 w-3 h-3 bg-[#23a559] border-2 border-[#232428] rounded-full"></div>
             </div>
-            <i onclick="openModal()" class="fas fa-gear text-gray-400 hover:text-white cursor-pointer p-1"></i>
+            <div class="flex-1 min-w-0 cursor-pointer" onclick="openSettings()">
+                <div id="mainName" class="text-sm font-bold truncate">Utilisateur_Web</div>
+                <div class="text-[10px] text-[#b5bac1]">En ligne</div>
+            </div>
+            <div class="flex gap-1 text-[#b5bac1]">
+                <i class="fas fa-microphone hover:bg-[#35363c] p-2 rounded cursor-pointer"></i>
+                <i onclick="openSettings()" class="fas fa-gear hover:bg-[#35363c] p-2 rounded cursor-pointer"></i>
+            </div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col bg-[#313338]">
-        <header class="h-12 border-b border-black/20 flex items-center px-4 font-bold gap-2">
-            <i class="fas fa-hashtag text-gray-400"></i> général
+    <main id="chatWindow" class="flex-1 flex flex-col bg-[#313338]">
+        <header class="h-12 border-b border-[#26272b] flex items-center px-4 font-bold shadow-sm">
+            <i class="fas fa-hashtag text-[#80848e] mr-2 text-xl"></i> 
+            <span id="channelTitle">général</span>
         </header>
-        <div id="chatBox" class="flex-1 p-4 overflow-y-auto discord-scrollbar space-y-4">
-            <div class="flex gap-4">
-                <div class="w-10 h-10 rounded-full bg-blue-500 flex-shrink-0"></div>
-                <div>
-                    <span class="font-bold text-white hover:underline cursor-pointer">Système</span>
-                    <span class="text-[10px] text-gray-400 ml-2">Aujourd'hui à 12:00</span>
-                    <p class="text-gray-300">Bienvenue sur ton clone ! Clique sur la roue dentée pour modifier ton profil.</p>
+        
+        <div id="messageArea" class="flex-1 overflow-y-auto discord-scroll p-4 space-y-4">
+            </div>
+
+        <div class="px-4 pb-6">
+            <div class="bg-[#383a40] rounded-lg flex items-center px-4 py-2 gap-4">
+                <i class="fas fa-circle-plus text-[#b5bac1] hover:text-white cursor-pointer text-xl"></i>
+                <input id="chatInput" type="text" placeholder="Envoyer un message..." class="bg-transparent flex-1 outline-none py-1 text-[#dbdee1]">
+                <div class="flex gap-3 text-[#b5bac1]">
+                    <i class="fas fa-gift hover:text-white cursor-pointer"></i>
+                    <i class="fas fa-face-smile hover:text-white cursor-pointer"></i>
                 </div>
             </div>
-        </div>
-        <div class="p-4">
-            <input type="text" placeholder="Envoyer un message dans #général" class="w-full bg-[#383a40] p-3 rounded-lg outline-none text-gray-200">
         </div>
     </main>
 
-    <div id="profileModal" class="modal items-center justify-center">
-        <div class="bg-[#313338] w-[500px] rounded-lg overflow-hidden shadow-2xl relative">
-            <div id="bannerPreview" class="h-24 bg-indigo-600 w-full bg-cover bg-center"></div>
-            <div class="px-6 pb-6 -mt-8 relative">
-                <img id="pfpPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-20 h-20 rounded-full border-8 border-[#313338] bg-gray-500">
-                <div class="mt-4 space-y-4">
-                    <h2 class="text-xl font-bold">Modifier le profil</h2>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Nom d'utilisateur</label>
-                        <input id="usernameInput" type="text" class="w-full bg-[#1e1f22] p-2 rounded mt-1 outline-none">
+    <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-[#313338] flex">
+        <aside class="w-1/3 bg-[#2b2d31] flex justify-end pt-16 pr-6">
+            <div class="w-48 space-y-2">
+                <h3 class="text-[#80848e] text-xs font-bold uppercase px-2 mb-2">Paramètres utilisateur</h3>
+                <div class="bg-[#3f4147] text-white p-2 rounded cursor-pointer font-medium">Mon profil</div>
+                <div class="text-[#b5bac1] hover:bg-[#35363c] p-2 rounded cursor-pointer font-medium">Apparence</div>
+                <div onclick="closeSettings()" class="text-[#f23f43] hover:bg-[#35363c] p-2 rounded cursor-pointer font-medium mt-4 border-t border-[#35363c] pt-4">Déconnexion</div>
+            </div>
+        </aside>
+        
+        <main class="flex-1 bg-[#313338] pt-16 px-12 relative">
+            <div onclick="closeSettings()" class="absolute right-20 top-16 flex flex-col items-center gap-1 cursor-pointer group">
+                <div class="w-9 h-9 border-2 border-[#b5bac1] rounded-full flex items-center justify-center group-hover:bg-[#35363c]">
+                    <i class="fas fa-xmark text-lg text-[#b5bac1]"></i>
+                </div>
+                <span class="text-[#b5bac1] text-xs font-bold uppercase">Esc</span>
+            </div>
+
+            <h2 class="text-xl font-bold mb-6 text-white">Profil d'utilisateur</h2>
+            
+            <div class="bg-[#1e1f22] rounded-lg overflow-hidden w-full max-w-2xl shadow-xl">
+                <div id="editBanner" class="h-28 bg-[#5865f2] relative cursor-pointer group bg-cover bg-center">
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition font-bold">Changer la bannière</div>
+                </div>
+                <div class="px-4 pb-6 relative">
+                    <div class="absolute -top-12 left-4 group cursor-pointer" onclick="document.getElementById('pfpFile').click()">
+                        <img id="editPfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-20 h-20 rounded-full border-8 border-[#1e1f22] bg-[#5865f2]">
+                        <div class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] font-bold">EDIT</div>
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Lien Photo de Profil (URL)</label>
-                        <input id="pfpInput" type="text" class="w-full bg-[#1e1f22] p-2 rounded mt-1 outline-none">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Lien Bannière (URL)</label>
-                        <input id="bannerInput" type="text" class="w-full bg-[#1e1f22] p-2 rounded mt-1 outline-none">
-                    </div>
-                    <div class="flex justify-end gap-3 mt-4">
-                        <button onclick="closeModal()" class="text-sm hover:underline">Annuler</button>
-                        <button onclick="saveProfile()" class="bg-[#5865f2] hover:bg-[#4752c4] px-4 py-2 rounded font-bold">Enregistrer</button>
+                    <div class="mt-12 bg-[#2b2d31] p-4 rounded-lg space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-[#b5bac1] uppercase">Nom d'utilisateur</label>
+                            <input id="editName" type="text" class="w-full bg-[#1e1f22] mt-1 p-2 rounded outline-none border border-transparent focus:border-[#00a8fc]">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-[#b5bac1] uppercase">Lien image (URL)</label>
+                            <input id="editPfpUrl" type="text" placeholder="https://..." class="w-full bg-[#1e1f22] mt-1 p-2 rounded outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-[#b5bac1] uppercase">Lien bannière (URL)</label>
+                            <input id="editBannerUrl" type="text" placeholder="https://..." class="w-full bg-[#1e1f22] mt-1 p-2 rounded outline-none">
+                        </div>
+                        <button onclick="saveSettings()" class="bg-[#5865f2] hover:bg-[#4752c4] px-6 py-2 rounded font-bold transition">Enregistrer</button>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        function openModal() { document.getElementById('profileModal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('profileModal').style.display = 'none'; }
-        
-        function saveProfile() {
-            const name = document.getElementById('usernameInput').value;
-            const pfp = document.getElementById('pfpInput').value;
-            const banner = document.getElementById('bannerInput').value;
+        // --- GESTION DU CHAT ---
+        const input = document.getElementById('chatInput');
+        const area = document.getElementById('messageArea');
 
-            if(name) document.getElementById('userNameDisplay').innerText = name;
-            if(pfp) {
-                document.getElementById('userPfp').src = pfp;
-                document.getElementById('pfpPreview').src = pfp;
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                const pfp = document.getElementById('mainPfp').src;
+                const name = document.getElementById('mainName').innerText;
+                addMessage(name, pfp, input.value);
+                input.value = "";
             }
-            if(banner) document.getElementById('bannerPreview').style.backgroundImage = `url(${banner})`;
-            
-            closeModal();
+        });
+
+        function addMessage(user, pfp, text) {
+            const div = document.createElement('div');
+            div.className = "flex gap-4 hover:bg-[#2e3035] -mx-4 px-4 py-1 group transition";
+            div.innerHTML = `
+                <img src="${pfp}" class="w-10 h-10 rounded-full bg-gray-600 mt-1">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-white hover:underline cursor-pointer">${user}</span>
+                        <span class="text-[10px] text-[#80848e]">Aujourd'hui à ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <p class="text-[#dbdee1]">${text}</p>
+                </div>
+            `;
+            area.appendChild(div);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        // --- GESTION PARAMÈTRES ---
+        function openSettings() { document.getElementById('settingsModal').classList.remove('hidden'); }
+        function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
+
+        function saveSettings() {
+            const newName = document.getElementById('editName').value;
+            const newPfp = document.getElementById('editPfpUrl').value;
+            const newBanner = document.getElementById('editBannerUrl').value;
+
+            if(newName) {
+                document.getElementById('mainName').innerText = newName;
+            }
+            if(newPfp) {
+                document.getElementById('mainPfp').src = newPfp;
+                document.getElementById('editPfp').src = newPfp;
+            }
+            if(newBanner) {
+                document.getElementById('editBanner').style.backgroundImage = `url(${newBanner})`;
+            }
+            closeSettings();
+        }
+
+        // --- GESTION AMIS (STUB) ---
+        function showFriends() {
+            document.getElementById('channelTitle').innerText = "Amis";
+            area.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-[#80848e]">
+                    <i class="fas fa-user-friends text-6xl mb-4"></i>
+                    <p>Wumpus attend des amis...</p>
+                    <button class="mt-4 bg-[#23a559] text-white px-4 py-2 rounded font-bold hover:bg-[#1a7a41]">Ajouter un ami</button>
+                </div>
+            `;
         }
     </script>
 </body>
